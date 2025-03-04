@@ -4,14 +4,14 @@ import os
 from dotenv import load_dotenv
 import fitz
 
-# Load API key from .env file
+
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Configure Gemini AI
+
 genai.configure(api_key=API_KEY)
 
-# Custom CSS (same as your current one)
+
 st.markdown(
     """
     <style>
