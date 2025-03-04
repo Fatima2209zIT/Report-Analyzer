@@ -11,11 +11,11 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 # Configure Gemini AI
 genai.configure(api_key=API_KEY)
 
-# Custom CSS for improved UI
+# Custom CSS (same as your current one)
 st.markdown(
     """
     <style>
-    .stApp {
+     .stApp {
         background-color: #121212;
         color: #ffffff;
         font-family: 'Arial', sans-serif;
@@ -64,6 +64,7 @@ st.markdown(
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
         color: #4CAF50;
     }
+ 
     </style>
     """,
     unsafe_allow_html=True,
@@ -77,6 +78,20 @@ def extract_text(file):
         for page in pdf_document:
             text += page.get_text("text")
     return text
+
+def is_medical_report(text):
+    """Check if the text is from a medical report."""
+    model = genai.GenerativeModel("gemini-2.0-flash")
+    response = model.generate_content(
+        f"""
+        Identify if the following text belongs to a blood test medical report.
+        Reply only with 'YES' or 'NO'.
+
+        Text:
+        {text}
+        """
+    )
+    return response.text.strip().upper() == "YES"
 
 def analyze_report(text):
     """Analyze blood test report using Gemini AI."""
@@ -114,27 +129,38 @@ uploaded_file = st.file_uploader("Upload File", type=["pdf"])
 if uploaded_file is not None:
     with st.spinner("Extracting text..."):
         extracted_text = extract_text(uploaded_file)
-    
-    with st.spinner("Analyzing report..."):
-        analysis = analyze_report(extracted_text)
-    
-    st.subheader("📊 Analysis Result")
-    st.markdown(f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{analysis}</div>", unsafe_allow_html=True)
-    
-    # AI Health Question Section
-    st.subheader("🤖 Ask AI a Health Question")
-    user_question = st.text_input("Enter your question (e.g., 'What does high WBC mean?')")
-    
-    if st.button("Get AI Response 🚀"):
-        if user_question:
-            with st.spinner("Processing..."):
-                ai_response = ask_question(user_question)
-            st.subheader("💡 AI's Answer:")
-            st.markdown(f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{ai_response}</div>", unsafe_allow_html=True)
+
+    with st.spinner("Checking if it's a blood test report..."):
+        if not is_medical_report(extracted_text):
+            st.error("❌ This is not a blood test report. Please upload a valid blood test medical report.")
         else:
-            st.warning("Please enter a question before clicking the button.")
-    
+            with st.spinner("Analyzing report..."):
+                analysis = analyze_report(extracted_text)
+
+            st.subheader("📊 Analysis Result")
+            st.markdown(
+                f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{analysis}</div>",
+                unsafe_allow_html=True
+            )
+
+            # AI Health Question Section
+            st.subheader("🤖 Ask AI a Health Question")
+            user_question = st.text_input("Enter your question (e.g., 'What does high WBC mean?')")
+
+            if st.button("Get AI Response 🚀"):
+                if user_question:
+                    with st.spinner("Processing..."):
+                        ai_response = ask_question(user_question)
+                    st.subheader("💡 AI's Answer:")
+                    st.markdown(
+                        f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{ai_response}</div>",
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.warning("⚠️ Please enter a question before clicking the button.")
+
 st.markdown(
     "<hr><p style='text-align: center; color: white;'>Made with ❤️ by Mehmil Zeeshan</p>",
     unsafe_allow_html=True
 )
+
