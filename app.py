@@ -19,8 +19,9 @@ st.markdown(
         background-color: #121212;
         color: #ffffff;
         font-family: 'Arial', sans-serif;
+        padding: 10px;
     }
-    .stButton>button {
+    .stButton>button, .stFileUploader>div>div>button {
         background-color: #4CAF50;
         color: white;
         border-radius: 12px;
@@ -28,31 +29,23 @@ st.markdown(
         font-size: 16px;
         border: none;
         transition: 0.3s;
+        width: 100%;
+        max-width: 300px;
+        margin: 10px auto;
+        display: block;
     }
-    .stButton>button:hover {
+    .stButton>button:hover, .stFileUploader>div>div>button:hover {
         background-color: #45a049;
-        transform: scale(1.05);
-    }
-    .stFileUploader>div>div>button {
-        background-color: #008CBA;
-        color: white;
-        border-radius: 12px;
-        padding: 12px 24px;
-        font-size: 16px;
-        border: none;
-        transition: 0.3s;
-    }
-    .stFileUploader>div>div>button:hover {
-        background-color: #007B9E;
         transform: scale(1.05);
     }
     .stTextInput>div>div>input {
         border-radius: 8px;
-        padding: 10px;
+        padding: 12px;
         font-size: 16px;
         background-color: #1e1e1e;
         color: #ffffff;
         border: 1px solid #444;
+        width: 100%;
     }
     .stMarkdown div {
         background-color: #1e1e1e;
@@ -60,15 +53,47 @@ st.markdown(
         border-radius: 8px;
         margin: 10px 0;
         font-size: 16px;
+        line-height: 1.6;
+        overflow-x: auto;
     }
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
         color: #4CAF50;
     }
- 
+
+    /* Responsive Design */
+    @media only screen and (max-width: 768px) {
+        .stButton>button, .stFileUploader>div>div>button {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+        .stTextInput>div>div>input {
+            font-size: 14px;
+            padding: 10px;
+        }
+        .stMarkdown div {
+            font-size: 14px;
+            padding: 12px;
+        }
+    }
+    @media only screen and (max-width: 480px) {
+        .stButton>button, .stFileUploader>div>div>button {
+            font-size: 12px;
+            padding: 8px 16px;
+        }
+        .stTextInput>div>div>input {
+            font-size: 12px;
+            padding: 8px;
+        }
+        .stMarkdown div {
+            font-size: 12px;
+            padding: 10px;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
 
 def extract_text(file):
     """Extract text from a PDF file."""
@@ -98,10 +123,30 @@ def analyze_report(text):
     model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(
         f"""
-        Analyze this blood test report and provide a summary.
-        Identify any abnormal values and compare them with normal ranges.
-        Report:
-        {text}
+   Analyze this blood test report and provide an extraordinary, highly professional, and engaging analysis:
+
+1. 📊 Create a **beautiful, well-structured table** listing:
+    - Test Name
+    - Patient's Value
+    - Normal Range
+    - Status (⬇️ LOW / ✅ NORMAL / ⬆️ HIGH)
+    - Emoji indicator
+
+2. 🚨 Boldly **highlight all abnormal values** in red with warning emojis to grab attention.
+
+3. 🧠 Write **detailed health risks** of each abnormal parameter with medical explanations, but make it easy to understand for a common person.
+
+4. 👨‍⚕️ Suggest the **best doctor specialists** for each issue with reasons (e.g., "Consult a Cardiologist 🫀 because...").
+
+5. 🥗 Recommend a **customized diet plan** with specific foods (like Spinach 🥬, Salmon 🐟) and a simple weekly routine.
+
+6. 🚀 End the analysis with an **inspirational health quote** to motivate the patient!
+
+Make the whole analysis super friendly, fun, colorful with emojis, and eye-catching like a professional health report designed by a top-level AI.
+Report:
+{text}
+
+
         """
     )
     return response.text
@@ -120,7 +165,7 @@ def ask_question(question):
     )
     return response.text
 
-# Streamlit UI
+
 st.title("🩺 Blood Test Report Analyzer")
 st.markdown("Upload your blood test report (PDF) and get an AI-powered analysis.")
 
@@ -143,7 +188,7 @@ if uploaded_file is not None:
                 unsafe_allow_html=True
             )
 
-            # AI Health Question Section
+          
             st.subheader("🤖 Ask AI a Health Question")
             user_question = st.text_input("Enter your question (e.g., 'What does high WBC mean?')")
 
