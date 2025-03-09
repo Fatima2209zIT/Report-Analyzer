@@ -197,32 +197,31 @@ uploaded_file = st.file_uploader("📤 Upload File", type=["pdf", "jpg", "jpeg",
 if uploaded_file:
     file_type = uploaded_file.type
 
-    # Display uploaded image
+    # Show image preview if it's an image file
     if file_type in ["image/png", "image/jpeg", "image/jpg"]:
         st.image(uploaded_file, caption="🖼️ Uploaded Medical Image", use_container_width=True)
-
 
     if st.button("🚀 Analyze File"):
         with st.spinner("🔍 Analyzing..."):
             analysis = analyze_medical_file(uploaded_file)
         st.subheader("📝 Analysis Result")
         st.markdown(f"<div class='analysis-box'>{analysis}</div>", unsafe_allow_html=True)
-
 # Symptom Checker UI
-st.title("🩺 AI-Powered Symptom Checker")
-symptoms = st.text_area("Enter your symptoms (e.g., 'fever, cough, fatigue'):")
-
-if st.button("🔍 Get Diagnosis"):
-    if symptoms:
-        with st.spinner("Analyzing symptoms..."):
-            diagnosis = analyze_medical_file(uploaded_file)
-        st.subheader("🔍 Diagnosis")
-        st.markdown(
-            f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{diagnosis}</div>",
-            unsafe_allow_html=True
-        )
-    else:
-        st.warning("⚠️ Please enter your symptoms first.")
-
+app_mode = "Symptom Checker"
+if app_mode == "Symptom Checker":
+    st.title("🩺 AI-Powered Symptom Checker")
+    symptoms = st.text_area("Enter your symptoms (e.g., 'fever, cough, fatigue'):")
+    if st.button("🔍 Get Diagnosis"):
+        if symptoms:
+            with st.spinner("Analyzing symptoms..."):
+                diagnosis = diagnose_symptoms(symptoms)
+            st.subheader("🔍 Diagnosis")
+            st.markdown(
+                f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{diagnosis}</div>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.warning("⚠️ Please enter your symptoms first.")
 # Footer
 st.markdown("<div class='footer'>⚕️ Designed for Medical Professionals | Empowered by Cutting-Edge AI Technology<br>Created with ❤️ by Mehmil Zeeshan</div>", unsafe_allow_html=True)
+
