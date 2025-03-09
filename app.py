@@ -4,126 +4,117 @@ import os
 from dotenv import load_dotenv
 import fitz
 
-
+# Load API Key
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
-
-
 genai.configure(api_key=API_KEY)
-
-
+st.set_page_config(page_title="💡 AI Medical Assistant 🏥")
+# Custom CSS for Enhanced UI
 st.markdown(
     """
-    <style>
-     .stApp {
-        background-color: #121212;
-        color: #ffffff;
-        font-family: 'Arial', sans-serif;
-        padding: 10px;
-    }
-    .stButton>button, .stFileUploader>div>div>button {
-        background-color: #4CAF50;
-        color: white;
-        border-radius: 12px;
-        padding: 12px 24px;
-        font-size: 16px;
-        border: none;
-        transition: 0.3s;
-        width: 100%;
-        max-width: 300px;
-        margin: 10px auto;
-        display: block;
-    }
-    .stButton>button:hover, .stFileUploader>div>div>button:hover {
-        background-color: #45a049;
-        transform: scale(1.05);
-    }
-    .stTextInput>div>div>input {
-        border-radius: 8px;
-        padding: 12px;
-        font-size: 16px;
-        background-color: #1e1e1e;
-        color: #ffffff;
-        border: 1px solid #444;
-        width: 100%;
-    }
-    .stMarkdown div {
-        background-color: #1e1e1e;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 10px 0;
-        font-size: 16px;
-        line-height: 1.6;
-        overflow-x: auto;
-    }
-    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #4CAF50;
-    }
-
-    /* Responsive Design */
-    @media only screen and (max-width: 768px) {
-        .stButton>button, .stFileUploader>div>div>button {
+      <style>
+        .stApp {
+            background-color: #0D1117;
+            color: #E6EDF3;
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+        .stButton>button {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 12px 24px;
+            transition: 0.3s;
+            border: none;
+            width: 100%;
+            max-width: 320px;
+            margin: 10px auto;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0, 200, 255, 0.4);
+        }
+        .stButton>button:hover {
+            background: linear-gradient(45deg, #0072ff, #00c6ff);
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(0, 200, 255, 0.6);
+        }
+        .analysis-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+            overflow-wrap: break-word;
+        }
+        .footer {
+            text-align: center;
+            padding: 15px;
             font-size: 14px;
-            padding: 10px 20px;
+            color: #888;
+            margin-top: 20px;
         }
-        .stTextInput>div>div>input {
-            font-size: 14px;
-            padding: 10px;
+        @media screen and (max-width: 600px) {
+            .stButton>button {
+                font-size: 16px;
+                padding: 10px 20px;
+                width: 100%;
+                max-width: 280px;
+            }
+            .analysis-box {
+                padding: 10px;
+            }
         }
-        .stMarkdown div {
-            font-size: 14px;
-            padding: 12px;
-        }
-    }
-    @media only screen and (max-width: 480px) {
-        .stButton>button, .stFileUploader>div>div>button {
-            font-size: 12px;
-            padding: 8px 16px;
-        }
-        .stTextInput>div>div>input {
-            font-size: 12px;
-            padding: 8px;
-        }
-        .stMarkdown div {
-            font-size: 12px;
-            padding: 10px;
-        }
-    }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
+# Sidebar - Medical Information
+st.sidebar.title("📚 Medical Reference")
+st.sidebar.markdown("**Normal Ranges for Common Tests:**")
+st.sidebar.markdown("- **WBC Count:** 4,000-11,000 cells/μL")
+st.sidebar.markdown("- **Hemoglobin (Hb):** 12-16 g/dL")
+st.sidebar.markdown("- **Platelet Count:** 150,000-450,000/μL")
+st.sidebar.markdown("- **Blood Sugar (Fasting):** 70-100 mg/dL")
+st.sidebar.markdown("- **Cholesterol (Total):** < 200 mg/dL")
+st.sidebar.markdown("- **LDL (Bad Cholesterol):** < 100 mg/dL")
+st.sidebar.markdown("- **HDL (Good Cholesterol):** > 40 mg/dL")
+st.sidebar.markdown("- **Triglycerides:** < 150 mg/dL")
+st.sidebar.markdown("- **Blood Pressure:** 120/80 mmHg")
+st.sidebar.markdown("- **Heart Rate:** 60-100 bpm")
+st.sidebar.markdown("---")
+st.sidebar.markdown("**For Experts:**")
+st.sidebar.markdown("- **CRP Levels:** < 10 mg/L")
+st.sidebar.markdown("- **D-Dimer Test:** < 0.5 μg/mL")
+st.sidebar.markdown("- **Troponin Levels:** < 0.01 ng/mL")
+st.sidebar.markdown("- **Bilirubin (Total):** 0.1-1.2 mg/dL")
+st.sidebar.markdown("- **ALT (Liver Enzyme):** 7-56 U/L")
+st.sidebar.markdown("- **AST (Liver Enzyme):** 10-40 U/L")
+st.sidebar.markdown("- **TSH (Thyroid Stimulating Hormone):** 0.4-4.0 mIU/L")
+st.sidebar.markdown("- **Vitamin D:** 20-50 ng/mL")
+st.sidebar.markdown("- **Vitamin B12:** 200-900 pg/mL")
+st.sidebar.markdown("- **Ferritin:** 30-400 ng/mL")
+st.sidebar.markdown("- **Calcium:** 8.5-10.2 mg/dL")
+st.sidebar.markdown("---")
+st.sidebar.markdown("📌 **Tip:** Consult your doctor if values are outside the normal range.")
 
-def extract_text(file):
-    """Extract text from a PDF file."""
-    text = ""
-    if file.name.endswith(".pdf"):
-        pdf_document = fitz.open(stream=file.read(), filetype="pdf")
-        for page in pdf_document:
-            text += page.get_text("text")
-    return text
 
-def is_medical_report(text):
-    """Check if the text is from a medical report."""
+# Function to Analyze Medical File
+def analyze_medical_file(uploaded_file):
     model = genai.GenerativeModel("gemini-2.0-flash")
-    response = model.generate_content(
-        f"""
-        Identify if the following text belongs to a blood test medical report.
-        Reply only with 'YES' or 'NO'.
+    file_data = uploaded_file.getvalue()
+    file_type = uploaded_file.type
 
-        Text:
-        {text}
-        """
-    )
-    return response.text.strip().upper() == "YES"
-
-def analyze_report(text):
-    """Analyze blood test report using Gemini AI."""
-    model = genai.GenerativeModel("gemini-2.0-flash")
-    response = model.generate_content(
-        f"""
-   Analyze this blood test report and provide an extraordinary, highly professional, and engaging analysis:
+    if file_type == "application/pdf":
+        with fitz.open(stream=file_data, filetype="pdf") as pdf:
+            text = "".join(page.get_text() for page in pdf)
+        
+        prompt =         f"""
+   Analyze this blood test report and provide an extraordinary, highly professional, and engaging analysis FIRST IDENTIFY THAT IF THE FILE
+   IS IS RELATED TO MEDICAL TEST REPORT OR MEDICAL IMAGE. IF IT IS RELATED TO MEDICAL TEST REPORT THEN FOLLOW THE BELOW GUIDELINES AND 
+   IF IT IS NOT RELATED TO MEDICAL IMAGE GIVE THE USER A MESSAGE THAT THE FILE IS NOT RELATED TO MEDICAL TEST REPORT OR MEDICAL SO I CAN'T 
+   ANALYZE. :
 
 1. 📊 Create a **beautiful, well-structured table** listing:
     - Test Name
@@ -148,64 +139,90 @@ Report:
 
 
         """
-    )
-    return response.text
+        response = model.generate_content(prompt)
+        return response.text
 
-def ask_question(question):
-    """Answer user questions about health or symptoms."""
-    model = genai.GenerativeModel("gemini-2.0-flash")
-    response = model.generate_content(
-        f"""
-        The patient is asking:
-        "{question}"
-        
-        Provide a helpful response. If it's about symptoms, suggest possible illnesses.
-        Disclaimer: THESE RESULTS MAY VARY, PLEASE CONSULT A DOCTOR!
+    elif file_type in ["image/png", "image/jpeg", "image/jpg"]:
+        prompt = """
+
+""You are an advanced medical AI assistant with specialized expertise in analyzing medical images and delivering precise, insightful medical evaluations. Your role is to:
+
+1️⃣ Conduct a thorough and accurate analysis of the medical image with exceptional attention to detail.
+2️⃣ Provide clear, structured, and professional medical observations.
+3️⃣ Identify and highlight any abnormalities or areas of concern that may require further evaluation.
+4️⃣ Utilize appropriate medical terminology, ensuring explanations are both scientifically accurate and easily understandable.
+5️⃣ Uphold patient confidentiality and adhere to the highest standards of medical ethics.
+6️⃣ Emphasize that your analysis serves as an informative guide but does not replace a professional medical diagnosis.. 
+GIVE A DISCLAIMER IN THE END THAT THIS IS AI GENERATED ADVICE AND NOT A SUBSTITUTE FOR PROFESSIONAL MEDICAL CONSULTATION. 
+
         """
-    )
+        response = model.generate_content(
+            [{"text": prompt}, {"inline_data": {"mime_type": file_type, "data": file_data}}]
+        )
+        return response.text
+
+    else:
+        return "❌ Unsupported file type. Please upload a PDF or medical image (JPG, PNG)."
+
+# AI-Powered Symptom Checker
+def diagnose_symptoms(symptoms):
+    model = genai.GenerativeModel("gemini-2.0-flash")
+    prompt =  f"""
+    You are a medical assistant. Based on the following symptoms, provide a detailed and structured response:
+    
+    **Symptoms**: {symptoms}
+
+    **Instructions**:
+    1. **Probable Diagnosis**: List the most likely conditions matching these symptoms. For each condition, provide:
+       - A brief description.
+       - Common causes.
+       - Risk level (low, medium, high).
+    2. **Severe Conditions**: Highlight any conditions that require urgent medical attention. Explain why they are urgent.
+    3. **Specialists to Consult**: Recommend the appropriate medical specialists for further evaluation.
+    4. **Home Remedies & Lifestyle Changes**: Suggest general home remedies and lifestyle changes to alleviate symptoms.
+    5. **Disclaimer**: Always include a disclaimer that this is AI-generated advice and not a substitute for professional medical consultation.
+
+    Format the response using clear headings, bullet points, and emojis for better readability.
+    """
+    response = model.generate_content(prompt)
     return response.text
 
 
-st.title("🩺 Blood Test Report Analyzer")
-st.markdown("Upload your blood test report (PDF) and get an AI-powered analysis.")
+# Main UI
+st.title("💡 AI Medical Report & Image Analyzer 🏥")
 
-uploaded_file = st.file_uploader("Upload File", type=["pdf"])
+# File Upload Section
+uploaded_file = st.file_uploader("📤 Upload File", type=["pdf", "jpg", "jpeg", "png"])
 
-if uploaded_file is not None:
-    with st.spinner("Extracting text..."):
-        extracted_text = extract_text(uploaded_file)
+if uploaded_file:
+    file_type = uploaded_file.type
 
-    with st.spinner("Checking if it's a blood test report..."):
-        if not is_medical_report(extracted_text):
-            st.error("❌ This is not a blood test report. Please upload a valid blood test medical report.")
-        else:
-            with st.spinner("Analyzing report..."):
-                analysis = analyze_report(extracted_text)
+    # Display uploaded image
+    if file_type in ["image/png", "image/jpeg", "image/jpg"]:
+        st.image(uploaded_file, caption="🖼️ Uploaded Medical Image", use_container_width=True)
 
-            st.subheader("📊 Analysis Result")
-            st.markdown(
-                f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{analysis}</div>",
-                unsafe_allow_html=True
-            )
 
-          
-            st.subheader("🤖 Ask AI a Health Question")
-            user_question = st.text_input("Enter your question (e.g., 'What does high WBC mean?')")
+    if st.button("🚀 Analyze File"):
+        with st.spinner("🔍 Analyzing..."):
+            analysis = analyze_medical_file(uploaded_file)
+        st.subheader("📝 Analysis Result")
+        st.markdown(f"<div class='analysis-box'>{analysis}</div>", unsafe_allow_html=True)
 
-            if st.button("Get AI Response 🚀"):
-                if user_question:
-                    with st.spinner("Processing..."):
-                        ai_response = ask_question(user_question)
-                    st.subheader("💡 AI's Answer:")
-                    st.markdown(
-                        f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{ai_response}</div>",
-                        unsafe_allow_html=True
-                    )
-                else:
-                    st.warning("⚠️ Please enter a question before clicking the button.")
+# Symptom Checker UI
+st.title("🩺 AI-Powered Symptom Checker")
+symptoms = st.text_area("Enter your symptoms (e.g., 'fever, cough, fatigue'):")
 
-st.markdown(
-    "<hr><p style='text-align: center; color: white;'>Made with ❤️ by Mehmil Zeeshan</p>",
-    unsafe_allow_html=True
-)
+if st.button("🔍 Get Diagnosis"):
+    if symptoms:
+        with st.spinner("Analyzing symptoms..."):
+            diagnosis = analyze_medical_file(uploaded_file)
+        st.subheader("🔍 Diagnosis")
+        st.markdown(
+            f"<div style='background-color: #222; padding: 15px; border-radius: 8px;'>{diagnosis}</div>",
+            unsafe_allow_html=True
+        )
+    else:
+        st.warning("⚠️ Please enter your symptoms first.")
 
+# Footer
+st.markdown("<div class='footer'>⚕️ Designed for Medical Professionals | Empowered by Cutting-Edge AI Technology<br>Created with ❤️ by Mehmil Zeeshan</div>", unsafe_allow_html=True)
